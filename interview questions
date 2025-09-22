@@ -1,0 +1,54 @@
+Task: Interview Questions — Port Scanning & Network Reconnaissance
+
+1. What is an open port?
+An open port is a network port on a host that is configured to accept incoming connections or packets for a particular service or application. When a service (e.g., SSH, HTTP, MySQL) is listening on a port, the port responds to network connection attempts and is considered "open." Open ports reveal which services a device exposes and can be used to connect to those services.
+
+2. How does Nmap perform a TCP SYN scan?
+A TCP SYN scan (nmap option -sS) is a stealthy scanning technique where Nmap sends a TCP packet with the SYN flag set to the target port. If the port replies with a SYN-ACK, it indicates the port is open (the scanner then typically sends an RST to avoid completing the TCP handshake). If the port replies with an RST, the port is closed. If there is no response or an ICMP unreachable is returned, the port is filtered (possibly by a firewall). Because the TCP handshake is not completed, SYN scans are less likely to be logged by some services and require raw socket privileges (root/administrator).
+
+3. What risks are associated with open ports?
+- Unauthorized access: Open ports may allow attackers to connect to services with weak authentication or misconfigurations.
+- Exploitation of vulnerabilities: Services behind open ports may contain software vulnerabilities that attackers can exploit (e.g., unpatched RDP or SMB).
+- Information leakage: Banner information and service versions can help attackers fingerprint systems and plan attacks.
+- Attack surface expansion: More open ports increase the number of vectors attackers can probe (brute force, injection, buffer overflow, misconfiguration).
+- Lateral movement and pivoting: Once compromised, an attacker may use open ports to move within a network.
+
+4. Explain the difference between TCP and UDP scanning.
+- TCP scanning: Targets TCP ports using TCP-specific probes (SYN, ACK, connect). TCP is connection-oriented; scanners look for TCP handshake responses (SYN-ACK, RST) to determine port states. Common TCP scan types include SYN (-sS), connect (-sT), and ACK scans.
+- UDP scanning: Targets UDP ports by sending UDP packets and interpreting responses. UDP is connectionless; an empty reply usually means the service accepted the packet (open or open|filtered), while an ICMP Port Unreachable (type 3, code 3) indicates the port is closed. UDP scanning is slower and less reliable due to lack of responses and rate-limited ICMP messages. UDP services include DNS (53), SNMP (161), and NTP (123).
+
+5. How can open ports be secured?
+- Minimize exposure: Disable unnecessary services; close unused ports.
+- Restrict access: Use firewalls (host-based and network) to limit which IPs can reach sensitive ports.
+- Strong authentication: Enforce strong passwords, multi-factor authentication, and use key-based auth where possible (e.g., SSH).
+- Patch and harden services: Keep software up to date; apply security configurations (disable legacy/insecure options).
+- Network segmentation: Place critical services in separate VLANs/subnets and apply strict access controls.
+- Use encryption and secure protocols: Prefer HTTPS over HTTP, SSH over Telnet, and configure TLS properly.
+- Monitoring and rate-limiting: Monitor logs, set up IDS/IPS, and throttle brute-force attempts (fail2ban).
+- Use VPNs or jump hosts for remote access rather than exposing services directly to the internet.
+
+6. What is a firewall's role regarding ports?
+A firewall inspects and filters traffic entering or leaving a network or host according to defined rules. Regarding ports, a firewall can:
+- Block or allow traffic to specific ports or ranges.
+- Restrict traffic by source/destination IP, protocol (TCP/UDP), and application.
+- Perform stateful inspection to allow established connections while blocking unsolicited requests.
+- Log and alert on blocked or suspicious connection attempts.
+Firewalls reduce attack surface by ensuring only authorized ports and hosts can communicate.
+
+7. What is a port scan and why do attackers perform it?
+A port scan is an automated process that probes a range of IP addresses and ports to discover which ports are open, closed, or filtered on a target host. Attackers perform port scans to:
+- Identify running services and their versions (fingerprinting).
+- Find vulnerable services to exploit.
+- Map an internal network and discover potential pivot points.
+- Prioritize targets for more detailed attacks (brute force, exploitation, data exfiltration).
+Note: Security teams also use port scanning for discovery and vulnerability assessment; legal authorization is required.
+
+8. How does Wireshark complement port scanning?
+Wireshark is a packet capture and analysis tool that captures raw network traffic and allows deep inspection of protocols, packet contents, and conversation flows. It complements port scanning by:
+- Verifying scan behavior: Inspecting packets to confirm how a scan was conducted and how hosts responded.
+- Capturing additional context: Recording payloads, retransmissions, and ICMP messages that explain scan results (e.g., why a port is filtered).
+- Troubleshooting: Helping diagnose false positives/negatives from scans (e.g., packet drops, firewall behavior).
+- Post-exploitation analysis: Investigating suspicious traffic, exfiltration, or lateral movement after detection.
+Together, port scanners find "what" is open; Wireshark shows "how" systems are communicating at packet level.
+
+---- End of file ----
